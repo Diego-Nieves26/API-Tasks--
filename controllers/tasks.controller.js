@@ -1,42 +1,36 @@
 // Models
 const { Task } = require("../models/task.model");
+const { User } = require("../models/user.model");
 
-const createTask = async (req, res, next) => {
-  try {
-    const { title, userId, limitDate } = req.body;
+// Utils
+const { catchAsync } = require("../utils/catchAsync.util");
 
-    const newTask = await Task.create({
-      title,
-      userId,
-      limitDate,
-      startDate: new Date().toISOString(),
-    });
+const createTask = catchAsync(async (req, res, next) => {
+  const { title, userId, limitDate } = req.body;
+  const newTask = await Task.create({
+    title,
+    userId,
+    limitDate,
+    startDate: new Date().toISOString(),
+  });
 
-    res.status(201).json({
-      status: "success",
-      newTask,
-    });
-  } catch (err) {
-    next(err);
-  }
-};
+  res.status(201).json({
+    status: "success",
+    newTask,
+  });
+});
 
-const getAllTasks = async (req, res) => {
-  try {
-    const tasks = await Task.findAll();
+const getAllTasks = catchAsync(async (req, res, next) => {
+  const tasks = await Task.findAll({ include: User });
 
-    res.status(200).json({
-      status: "success",
-      tasks,
-    });
-  } catch (err) {
-    console.log(err);
-  }
-};
+  res.status(200).json({
+    status: "success",
+    tasks,
+  });
+});
 
-const getTaskByStatus = async (req, res) => {
+const getTaskByStatus = catchAsync(async (req, res, next) => {
   const { status } = req.params;
-
   const tasks = await Task.findAll({ where: { status } });
 
   if (
@@ -56,16 +50,14 @@ const getTaskByStatus = async (req, res) => {
       message: "Post not found",
     });
   }
-
   res.status(200).json({
     status: "success",
     tasks,
   });
-};
+});
 
-const updateTask = async (req, res, next) => {
+const updateTask = catchAsync(async (req, res, next) => {
   const { task } = req;
-
   const { time } = req.body;
 
   if (Date.parse(time) <= Date.parse(task.limitDate)) {
@@ -73,13 +65,11 @@ const updateTask = async (req, res, next) => {
   } else {
     await task.update({ finishDate: time, status: "late" });
   }
-
   res.status(204).json({ status: "success" });
-};
+});
 
-const cancelTask = async (req, res) => {
+const cancelTask = catchAsync(async (req, res, next) => {
   const { id } = req.params;
-
   const task = await Task.findOne({ where: { id } });
 
   if (!task) {
@@ -88,11 +78,9 @@ const cancelTask = async (req, res) => {
       message: "Taks not found",
     });
   }
-
   await task.update({ status: "cancelled" });
-
   res.status(204).json({ status: "success" });
-};
+});
 
 module.exports = {
   getAllTasks,

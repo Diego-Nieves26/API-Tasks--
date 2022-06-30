@@ -4,7 +4,6 @@ const { Task } = require("../models/task.model");
 
 // Utils
 const { catchAsync } = require("../utils/catchAsync.util");
-const { AppError } = require("../utils/appError.util");
 
 const createUser = catchAsync(async (req, res, next) => {
   const { name, email, password } = req.body;
