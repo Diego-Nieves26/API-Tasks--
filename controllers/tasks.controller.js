@@ -4,14 +4,25 @@ const { User } = require("../models/user.model");
 
 // Utils
 const { catchAsync } = require("../utils/catchAsync.util");
+const { AppError } = require("../utils/appError.util");
 
 const createTask = catchAsync(async (req, res, next) => {
   const { title, userId, limitDate } = req.body;
+
+  const user = await User.findOne({ _id: userId });
+
+  if (!user) {
+    return next(new AppError("User not found", 404));
+  }
+
   const newTask = await Task.create({
-    title,
     userId,
-    limitDate,
-    startDate: new Date().toISOString(),
+    title,
+    dates: {
+      limitDate,
+      startDate: new Date().toISOString(),
+      finishDate: null,
+    },
   });
 
   res.status(201).json({
@@ -21,7 +32,7 @@ const createTask = catchAsync(async (req, res, next) => {
 });
 
 const getAllTasks = catchAsync(async (req, res, next) => {
-  const tasks = await Task.findAll({ include: User });
+  const tasks = await Task.find();
 
   res.status(200).json({
     status: "success",
@@ -31,7 +42,7 @@ const getAllTasks = catchAsync(async (req, res, next) => {
 
 const getTaskByStatus = catchAsync(async (req, res, next) => {
   const { status } = req.params;
-  const tasks = await Task.findAll({ where: { status } });
+  const tasks = await Task.find({ status });
 
   if (
     status !== "active" &&
@@ -44,12 +55,7 @@ const getTaskByStatus = catchAsync(async (req, res, next) => {
       message: "Invalid status",
     });
   }
-  if (!tasks) {
-    return res.status(404).json({
-      status: "error",
-      message: "Post not found",
-    });
-  }
+
   res.status(200).json({
     status: "success",
     tasks,
@@ -65,20 +71,15 @@ const updateTask = catchAsync(async (req, res, next) => {
   } else {
     await task.update({ finishDate: time, status: "late" });
   }
+
   res.status(204).json({ status: "success" });
 });
 
 const cancelTask = catchAsync(async (req, res, next) => {
-  const { id } = req.params;
-  const task = await Task.findOne({ where: { id } });
+  const { task } = req;
 
-  if (!task) {
-    return res.status(404).json({
-      status: "error",
-      message: "Taks not found",
-    });
-  }
   await task.update({ status: "cancelled" });
+
   res.status(204).json({ status: "success" });
 });
 

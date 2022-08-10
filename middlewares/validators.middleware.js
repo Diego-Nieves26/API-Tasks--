@@ -28,11 +28,7 @@ const createUserValidator = [
 
 const createTaskValidator = [
   body("title").notEmpty().withMessage("Title cannot be empty"),
-  body("userId")
-    .notEmpty()
-    .withMessage("UserId cannot be empty")
-    .isNumeric()
-    .withMessage("UserId must be an integer"),
+  body("userId").notEmpty().withMessage("UserId cannot be empty"),
   checkResult,
 ];
 

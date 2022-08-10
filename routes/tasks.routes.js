@@ -15,11 +15,15 @@ const { taskExists } = require("../middlewares/tasks.middleware");
 
 const tasksRouter = express.Router();
 
-//Routes
+// Endpoints
 tasksRouter.post("/", createTaskValidator, createTask);
+
 tasksRouter.get("/", getAllTasks);
+
 tasksRouter.get("/:status", getTaskByStatus);
+
 tasksRouter.patch("/:id", taskExists, updateTask);
-tasksRouter.delete("/:id", cancelTask);
+
+tasksRouter.delete("/:id", taskExists, cancelTask);
 
 module.exports = { tasksRouter };

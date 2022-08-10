@@ -1,30 +1,25 @@
-const { db, DataTypes } = require("../utils/database.util");
+const mongoose = require("mongoose");
 
-const User = db.define("user", {
-  id: {
-    primaryKey: true,
-    type: DataTypes.INTEGER,
-    autoIncrement: true,
-    allowNull: false,
-  },
+const userSchema = new mongoose.Schema({
   name: {
-    type: DataTypes.STRING,
-    allowNull: false,
+    type: String,
+    required: [true, "Please provide a valid name"],
   },
   email: {
-    type: DataTypes.STRING,
+    type: String,
+    required: [true, "Please enter your email"],
     unique: true,
-    allowNull: false,
   },
   password: {
-    type: DataTypes.STRING,
-    allowNull: false,
+    type: String,
+    required: [true, "Please enter your password"],
   },
   status: {
-    type: DataTypes.STRING,
-    defaultValue: "active",
-    allowNull: false,
+    type: String,
+    default: "active",
   },
 });
+
+const User = mongoose.model("User", userSchema);
 
 module.exports = { User };

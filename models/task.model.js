@@ -1,37 +1,28 @@
-const { db, DataTypes } = require("../utils/database.util");
+const mongoose = require("mongoose");
 
-const Task = db.define("task", {
-  id: {
-    primaryKey: true,
-    type: DataTypes.INTEGER,
-    autoIncrement: true,
-    allowNull: false,
-  },
+const taskSchema = new mongoose.Schema({
   userId: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
+    type: String,
+    required: [true, "Please enter a userId"],
   },
   title: {
-    type: DataTypes.STRING,
-    allowNull: false,
+    type: String,
+    required: [true, "Please provide a valid title"],
   },
-  limitDate: {
-    type: DataTypes.DATE,
-    allowNull: false,
-  },
-  startDate: {
-    type: DataTypes.DATE,
-    allowNull: true,
-  },
-  finishDate: {
-    type: DataTypes.DATE,
-    allowNull: true,
+  dates: {
+    limitDate: {
+      type: String,
+      required: [true, "Please provide a valid limitDate"],
+    },
+    startDate: String,
+    finishDate: String,
   },
   status: {
-    type: DataTypes.STRING,
-    allowNull: false,
-    defaultValue: "active",
+    type: String,
+    default: "active",
   },
 });
+
+const Task = mongoose.model("Task", taskSchema);
 
 module.exports = { Task };
