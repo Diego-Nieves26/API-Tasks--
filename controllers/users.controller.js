@@ -28,7 +28,7 @@ const createUser = catchAsync(async (req, res, next) => {
 });
 
 const getAllActiveUsers = catchAsync(async (req, res, next) => {
-  const users = await User.find({ status: "active" });
+  const users = await User.find({ status: "active" }).populate("tasks");
 
   res.status(200).json({
     status: "success",

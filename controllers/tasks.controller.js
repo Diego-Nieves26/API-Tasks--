@@ -32,7 +32,10 @@ const createTask = catchAsync(async (req, res, next) => {
 });
 
 const getAllTasks = catchAsync(async (req, res, next) => {
-  const tasks = await Task.find();
+  const tasks = await Task.find({ status: "active" }).populate(
+    "userId",
+    "-password"
+  );
 
   res.status(200).json({
     status: "success",
@@ -66,7 +69,7 @@ const updateTask = catchAsync(async (req, res, next) => {
   const { task } = req;
   const { time } = req.body;
 
-  if (Date.parse(time) <= Date.parse(task.limitDate)) {
+  if (Date.parse(time) <= Date.parse(task.dates.limitDate)) {
     await task.update({ finishDate: time, status: "completed" });
   } else {
     await task.update({ finishDate: time, status: "late" });

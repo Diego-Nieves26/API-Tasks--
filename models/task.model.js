@@ -2,8 +2,8 @@ const mongoose = require("mongoose");
 
 const taskSchema = new mongoose.Schema({
   userId: {
-    type: String,
-    required: [true, "Please enter a userId"],
+    ref: "User",
+    type: mongoose.Schema.ObjectId,
   },
   title: {
     type: String,
@@ -11,11 +11,11 @@ const taskSchema = new mongoose.Schema({
   },
   dates: {
     limitDate: {
-      type: String,
+      type: Date,
       required: [true, "Please provide a valid limitDate"],
     },
-    startDate: String,
-    finishDate: String,
+    startDate: Date,
+    finishDate: Date,
   },
   status: {
     type: String,
